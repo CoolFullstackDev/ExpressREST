@@ -1,6 +1,7 @@
-doctype html
-html
-    head
-        title Knowledgebase
-    body
-        h1 Articles
+extends layout
+
+block content
+    h1 #{title}
+    ul
+        each article, i in articles
+            li article.title
