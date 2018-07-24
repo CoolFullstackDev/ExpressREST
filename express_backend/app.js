@@ -1,6 +1,8 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+
 
 mongoose.connect('mongodb://localhost/nodekb');
 let db = mongoose.connection;
@@ -21,10 +23,17 @@ const app = express();
 // Bring in Models
 let Article = require('./models/article');
 
-
 // Load View Engine
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+
+// Body Parser Middleware
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
+// Set public Folder
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 // Home Route
 app.get('/', function(req, res){
@@ -46,6 +55,24 @@ app.get('/', function(req, res){
 app.get('/articles/add', function(req, res){
     res.render('add_article', {
         title: 'Add Article'
+    });
+});
+
+// Add Submit POST Route
+app.post('/articles/add', function(req, res){
+    let article = new Article();
+
+    article.title = req.body.title;
+    article.author = req.body.author;
+    article.content = req.body.content;
+    console.log(article);
+    article.save(function(err){
+        if(err){
+            console.log(err);
+            return;
+        }else{
+            res.redirect('/');
+        }
     });
 });
 
